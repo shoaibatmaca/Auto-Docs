@@ -1,5 +1,13 @@
+import os
+import django
+from django.conf import settings
+
+if not settings.configured:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.settings')
+    django.setup()
+
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from rest_framework import serializers, viewsets
 from autoapi_swagger.utils import (
     get_serializer_fields,
@@ -9,14 +17,14 @@ from autoapi_swagger.utils import (
 )
 
 
-class TestSerializer(serializers.Serializer):
+class MockSerializer(serializers.Serializer):
     name = serializers.CharField(help_text='Name field')
     age = serializers.IntegerField(required=False)
     email = serializers.EmailField()
 
 
-class TestViewSet(viewsets.ModelViewSet):
-    serializer_class = TestSerializer
+class MockViewSet(viewsets.ModelViewSet):
+    serializer_class = MockSerializer
 
     def get_queryset(self):
         return None
@@ -24,7 +32,7 @@ class TestViewSet(viewsets.ModelViewSet):
 
 class CoreTestCase(unittest.TestCase):
     def test_get_serializer_fields(self):
-        fields = get_serializer_fields(TestSerializer)
+        fields = get_serializer_fields(MockSerializer)
         self.assertIn('name', fields)
         self.assertIn('age', fields)
         self.assertIn('email', fields)
@@ -34,7 +42,7 @@ class CoreTestCase(unittest.TestCase):
         self.assertTrue(fields['name']['required'])
 
     def test_get_view_actions(self):
-        actions = get_view_actions(TestViewSet)
+        actions = get_view_actions(MockViewSet)
         self.assertIn('list', actions)
         self.assertIn('create', actions)
         self.assertIn('retrieve', actions)
@@ -42,8 +50,8 @@ class CoreTestCase(unittest.TestCase):
         self.assertEqual(actions['create']['method'], 'POST')
 
     def test_get_view_serializer(self):
-        serializer = get_view_serializer(TestViewSet)
-        self.assertEqual(serializer, TestSerializer)
+        serializer = get_view_serializer(MockViewSet)
+        self.assertEqual(serializer, MockSerializer)
 
     @patch('autoapi_swagger.docs_generator.get_resolver')
     def test_get_openapi_schema(self, mock_resolver):

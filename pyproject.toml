@@ -38,12 +38,14 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
+    "pytest-django>=4.5",
 ]
 
 [tool.setuptools]
 packages = ["autoapi_swagger"]
 
 [tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
 python_files = "test_*.py"
 testpaths = ["tests"]
 

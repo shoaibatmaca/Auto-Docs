@@ -98,9 +98,6 @@ def get_view_actions(view_class: Type[Any]) -> Dict[str, Dict[str, Any]]:
 
 
 def get_view_serializer(view_class: Type[Any]) -> Optional[Type[serializers.Serializer]]:
-    if hasattr(view_class, 'get_serializer_class'):
-        return view_class.get_serializer_class()
-    
     if hasattr(view_class, 'serializer_class'):
         return view_class.serializer_class
     
