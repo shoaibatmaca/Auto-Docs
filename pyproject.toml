@@ -45,7 +45,6 @@ dev = [
 packages = ["autoapi_swagger"]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "tests.settings"
 python_files = "test_*.py"
 testpaths = ["tests"]
 

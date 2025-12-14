@@ -5,7 +5,7 @@
 Install dependencies:
 
 ```bash
-pip install Django djangorestframework pytest pytest-django
+pip install pytest
 ```
 
 Or install from project:
@@ -19,30 +19,35 @@ pip install -e ".[dev]"
 ### Run all tests:
 
 ```bash
-pytest tests/ -v
+python -m pytest tests/ -v
 ```
 
 ### Run specific test file:
 
 ```bash
-pytest tests/test_core.py -v
+python -m pytest tests/test_core.py -v
 ```
 
 ### Run specific test:
 
 ```bash
-pytest tests/test_core.py::CoreTestCase::test_get_serializer_fields -v
+python -m pytest tests/test_core.py::ConstantsTestCase::test_openapi_version -v
 ```
 
 ### Run with coverage:
 
 ```bash
-pytest tests/ -v --cov=autoapi_swagger --cov-report=html
+python -m pytest tests/ -v --cov=autoapi_swagger --cov-report=html
 ```
 
 ## Test Structure
 
-- `tests/settings.py` - Minimal Django settings for tests
-- `tests/conftest.py` - Django setup for pytest
-- `tests/urls.py` - URL configuration for tests
-- `tests/test_core.py` - Core functionality tests
+- `tests/test_core.py` - Pure Python unit tests (no Django/DRF dependencies)
+
+## Note
+
+These tests are pure Python unit tests that don't require Django or DRF to be configured. They test:
+
+- Constants and configuration values
+- Response building functions (with mocks)
+- Pure Python logic
