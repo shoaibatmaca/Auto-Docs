@@ -1,7 +1,6 @@
-from django.test import TestCase
+import unittest
+from unittest.mock import patch, MagicMock
 from rest_framework import serializers, viewsets
-from rest_framework.test import APIRequestFactory
-from autoapi_swagger import get_openapi_schema
 from autoapi_swagger.utils import (
     get_serializer_fields,
     get_view_actions,
@@ -16,19 +15,14 @@ class TestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
 
-class TestModel:
-    class _meta:
-        pass
-
-
 class TestViewSet(viewsets.ModelViewSet):
     serializer_class = TestSerializer
-    
+
     def get_queryset(self):
         return None
 
 
-class CoreTestCase(TestCase):
+class CoreTestCase(unittest.TestCase):
     def test_get_serializer_fields(self):
         fields = get_serializer_fields(TestSerializer)
         self.assertIn('name', fields)
@@ -38,7 +32,7 @@ class CoreTestCase(TestCase):
         self.assertEqual(fields['age']['type'], 'integer')
         self.assertFalse(fields['age']['required'])
         self.assertTrue(fields['name']['required'])
-    
+
     def test_get_view_actions(self):
         actions = get_view_actions(TestViewSet)
         self.assertIn('list', actions)
@@ -46,12 +40,17 @@ class CoreTestCase(TestCase):
         self.assertIn('retrieve', actions)
         self.assertEqual(actions['list']['method'], 'GET')
         self.assertEqual(actions['create']['method'], 'POST')
-    
+
     def test_get_view_serializer(self):
         serializer = get_view_serializer(TestViewSet)
         self.assertEqual(serializer, TestSerializer)
-    
-    def test_get_openapi_schema(self):
+
+    @patch('autoapi_swagger.docs_generator.get_resolver')
+    def test_get_openapi_schema(self, mock_resolver):
+        from autoapi_swagger import get_openapi_schema
+        
+        mock_resolver.return_value.url_patterns = []
+        
         schema = get_openapi_schema(
             title='Test API',
             version='1.0.0',
@@ -61,4 +60,3 @@ class CoreTestCase(TestCase):
         self.assertEqual(schema['info']['version'], '1.0.0')
         self.assertIn('paths', schema)
         self.assertIn('components', schema)
-
